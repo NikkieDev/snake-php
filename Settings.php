@@ -59,7 +59,6 @@ class Settings
 		}
 	}
 
-
 	private function askKey(string $action): string
 	{
 		$key = '';
