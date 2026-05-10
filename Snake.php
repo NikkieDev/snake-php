@@ -5,6 +5,7 @@ include_once "Enum/Direction.php";
 class Snake
 {
 	private Direction $direction = Direction::RIGHT;
+	private bool $dead = false;
 	private array $body = ['#'];
 
 	public function __construct()
@@ -48,5 +49,10 @@ class Snake
 	public function setDirection(Direction $direction): void
 	{
 		$this->direction = $direction;
+	}
+
+	public function isDead(): bool
+	{
+		return $this->dead;
 	}
 }

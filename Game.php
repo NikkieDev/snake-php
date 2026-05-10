@@ -18,7 +18,6 @@ class Game
 	{
 		Graphics::hideCursor();
 
-
 		while (true) {
 			usleep(self::TICK);
 			if (!$this->update()) {
@@ -44,6 +43,11 @@ class Game
 		Graphics::drawBorder(50, 20);
 		Graphics::moveCursor(new Point(10, 5));
 		Graphics::drawSnake($this->getPlayerOne()->getSnake());
+
+		if ($this->getPlayerTwo()) {
+			Graphics::moveCursor(new Point(40, 5));
+			Graphics::drawSnake($this->getPlayerTwo()->getSnake());
+		}
 		return true;
 	}
 
