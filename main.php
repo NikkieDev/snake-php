@@ -27,5 +27,7 @@ if ($gameSettings->multiplayer) {
 	$snakes[] = $playerTwo->getSnake();
 }
 
+$playerOne->getSnake()->grow();
+
 $game = new Game($players, $gameSettings);
 $game->start();

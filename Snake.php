@@ -5,6 +5,7 @@ include_once "Enum/Direction.php";
 class Snake
 {
 	private Direction $direction = Direction::RIGHT;
+	private ?Point $location = null;
 	private bool $dead = false;
 	private array $body = ['#'];
 
@@ -33,12 +34,30 @@ class Snake
 	 * </summary>
 	 *
 	 * <algo>
-	 * Loop through body parts and move each part to the position of the next
-	 * Move head to desired position using $this->direction
+	 * Loop through body parts and move each part to the location of the next
+	 * Move head to desired location using $this->direction
 	 * </algo>
 	 */
 	public function move(): void
 	{
+		$this->location = match ($this->direction) {
+			Direction::UP => new Point($this->location->x, $this->location->y+1),
+			Direction::RIGHT => new Point($this->location->x+1, $this->location->y),
+			Direction::DOWN => new Point($this->location->x, $this->location->y-1),
+			Direction::LEFT => new Point($this->location->x-1, $this->location->y)
+		};
+
+		Graphics::moveCursor($this->location);
+	}
+
+	public function getLocation(): ?Point
+	{
+		return $this->location;
+	}
+
+	public function setLocation(Point $loc): void
+	{
+		$this->location = $loc;
 	}
 
 	public function getBody(): array

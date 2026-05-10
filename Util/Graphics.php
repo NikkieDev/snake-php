@@ -5,6 +5,8 @@ include_once "Util/Point.php";
 
 class Graphics
 {
+	private static ?Point $pos = null;
+
 	public static function clearScreen(): void
 	{
 		system('clear');
@@ -18,6 +20,12 @@ class Graphics
 	public static function moveCursor(Point $point): void
 	{
 		echo "\033[".$point->y.";".$point->x."H";
+		self::$pos = $point;
+	}
+
+	public static function getCursorPos(): ?Point
+	{
+		return self::$pos;
 	}
 
 	public static function drawBorder(int $w, int $h): void
