@@ -37,6 +37,8 @@ class Graphics
 			self::moveCursor(new Point($w, $i));
 			echo "#";
 		}
+
+		self::moveCursor(new Point(1, 1));
 	}
 
 	public static function drawSnake(Snake $snake): void

@@ -3,6 +3,7 @@
 include_once "Settings.php";
 include_once "Player.php";
 include_once "Util/Graphics.php";
+include_once "Util/Point.php";
 
 class Game
 {
@@ -16,10 +17,7 @@ class Game
 	public function start()
 	{
 		Graphics::hideCursor();
-		Graphics::clearScreen();
-		Graphics::drawBorder(50, 20);
 
-		
 
 		while (true) {
 			usleep(self::TICK);
@@ -42,7 +40,11 @@ class Game
 	 */
 	private function update()
 	{
-		
+		Graphics::clearScreen();
+		Graphics::drawBorder(50, 20);
+		Graphics::moveCursor(new Point(10, 5));
+		Graphics::drawSnake($this->getPlayerOne()->getSnake());
+		return true;
 	}
 
 	private function decideWinner(): void

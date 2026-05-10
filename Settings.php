@@ -66,6 +66,10 @@ class Settings
 		echo "Please press a key for ".$action.": ";
 		fscanf(STDIN, "%c\n", $key);
 
-		return $key;
+		while (empty($key)) {
+			return $this->askKey($action);
+		}
+
+		return strtolower($key);
 	}
 }
