@@ -7,7 +7,7 @@ include_once "Util/Point.php";
 
 class Game
 {
-	private const float TICK = 15.6 * 1000;
+	private const float TICK = 75 * 1000;
 
 	public function __construct(private readonly array $players, private readonly Settings $gameSettings)
 	{
@@ -69,13 +69,16 @@ class Game
 		Graphics::clearScreen();
 		Graphics::drawBorder(50, 20);
 
+		$this->getPlayerOne()->getSnake()->move();
 		Graphics::moveCursor($this->getPlayerOne()->getSnake()->getLocation());
 		Graphics::drawSnake($this->getPlayerOne()->getSnake());
 
 		if ($this->getPlayerTwo()) {
+			$this->getPlayerTwo()->getSnake()->move();
 			Graphics::moveCursor($this->getPlayerTwo()->getSnake()->getLocation());
 			Graphics::drawSnake($this->getPlayerTwo()->getSnake());
 		}
+
 		return true;
 	}
 

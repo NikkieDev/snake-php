@@ -59,6 +59,11 @@ class Settings
 		}
 	}
 
+	public function getKeys(Player $player): array
+	{
+		return $this->keys['player'.$player->getId()];
+	}
+
 	private function askKey(string $action): string
 	{
 		$key = '';
