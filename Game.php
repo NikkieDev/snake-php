@@ -14,43 +14,70 @@ class Game
 	{
 	}
 
+	/**
+	 * <summary>
+	 * Start the game
+	 * </summary>
+	 *
+	 * <algo>
+	 * Starts the game. Call a frame every TICK milliseconds while no one has lost.
+	 * If someone loses, clear the screen and display the 'Game over' screen based on gamemode
+	 * </algo>
+	 */
 	public function start()
 	{
 		$this->init();
 
-		while (true) {
+		while ($this->update()) {
 			usleep(self::TICK);
-			if (!$this->update()) {
-				$winner = $this->decideWinner();
-				Graphics::clearScreen();
-				echo $winner->getName().' Wins!';
-				break;
-			}
+		}
+
+		Graphics::clearScreen();
+
+		if (!$this->gameSettings->multiplayer) {
+			echo "GAME OVER".PHP_EOL;;
+			echo "Score: ". $this->getPlayerOne()->getScore().PHP_EOL;
+		} else {
+			$alive = array_find($this->players, fn(Player $player) => !$player->getSnake()->isDead());
+			echo $alive->getName().' Won!'.PHP_EOL;
 		}
 	}
 
+	/**
+	 * <summary>
+	 * Initialize the game
+	 * </summary>
+	 *
+	 * <algo>
+	 * Set terminal to accept input without requiring buffer flush
+	 * Make input stream non blocking.
+	 * Hide the cursor in the terminal, clear the screen and create a playing field.
+	 * Spawn a fruit that can be rendered and picked up by snake.
+	 * Spawn both snakes
+	 * </algo>
+	 */
 	private function init()
 	{
 		system('stty -icanon -echo');
 		stream_set_blocking(STDIN, false);
 
-		$this->spawnFruit();
-
 		Graphics::hideCursor();
 		Graphics::clearScreen();
 		Graphics::drawBorder(50, 20);
 
+		$this->spawnFruit();
+
 		$snakeOnePos = new Point(10, 5);
 		$snakeTwoPos = new Point(40, 5);
 
-		Graphics::moveCursor($snakeOnePos);
-		Graphics::drawSnake($this->getPlayerOne()->getSnake());
+		// Set initial snake location and move snake
 		$this->getPlayerOne()->getSnake()->setLocation($snakeOnePos);
+		$this->getPlayerOne()->getSnake()->move();
 
-		if ($this->getPlayerTwo()) {
-			Graphics::moveCursor($snakeTwoPos);
-			Graphics::drawSnake($this->getPlayerTwo()->getSnake());
+		// If multiple players, set second players' snake location and move their snake
+		if ($this->gameSettings->multiplayer) {
 			$this->getPlayerTwo()->getSnake()->setLocation($snakeTwoPos);
+			$this->getPlayerTwo()->getSnake()->move();
 		}
 	}
 
@@ -72,23 +99,16 @@ class Game
 		Graphics::clearScreen();
 		Graphics::drawBorder(50, 20);
 
+		// Move all snakes, unless one has died.
 		foreach ($this->players as $player) {
 			if ($player->getSnake()->isDead()) return false;
-
 			$player->getSnake()->move();
-			Graphics::moveCursor($player->getSnake()->getLocation());
-			Graphics::drawSnake($player->getSnake());
 		}
 
-		$this->renderFruit();
+		// Render spawned fruit.
+		Graphics::drawFruit($this->fruitLocation);
 
 		return true;
-	}
-
-	private function renderFruit(): void
-	{
-		Graphics::moveCursor($this->fruitLocation);
-		echo "$";
 	}
 
 	/**
@@ -138,14 +158,19 @@ class Game
 		$borderY = [1, 20];
 
 		foreach ($this->players as $player) {
+			// Check if snake is touching border.
 			if (in_array($player->getSnake()->getLocation()->x, $borderX) || in_array($player->getSnake()->getLocation()->y, $borderY)) {
 				$player->getSnake()->kill();
 			}
 
+			// Check if snake is touching a snake body part
 			if (in_array($player->getSnake()->getLocation(), $this->getAllPlayerBodyLocations())) {
 				$player->getSnake()->kill();
 			}
 
+			// Check if snake has found a fruit
+			// 'Eat' the fruit, grow the snake
+			// Calculate a new fruit.
 			if ($player->getSnake()->getLocation() == $this->fruitLocation) {
 				$player->getSnake()->grow();
 				$this->spawnFruit();
@@ -153,15 +178,22 @@ class Game
 		}
 	}
 
+	/**
+	 * <summary>
+	 * Get all snake body part locations
+	 * </summary>
+	 *
+	 * <algo>
+	 * Create a list by looping through all players and getting the body part locations of those snakes.
+	 * </algo>
+	 */
 	private function getAllPlayerBodyLocations(): array
 	{
 		$locations = [];
 
-		foreach ($this->players as $player) {
-			foreach ($player->getSnake()->getBodyPartLocations() as $partLocation) {
+		foreach ($this->players as $player)
+			foreach ($player->getSnake()->getBody() as $partLocation)
 				$locations[] = $partLocation;
-			}
-		}
 
 		return $locations;
 	}
@@ -177,13 +209,17 @@ class Game
 	 */
 	private function handleInput()
 	{
+		// Get input from stream
 		$key = stream_get_contents(STDIN, 1);
 
+		// If no key was pressed just continue
 		if (!$key) {
 			return;
 		}
 
+		// Check the key against every players' keybinds
 		foreach ($this->players as $player) {
+			// Get the keybinds for the current player
 			$playerBinds = $this->gameSettings->getKeys($player);
 			switch ($key) {
 				case $playerBinds['UP']:
@@ -202,16 +238,16 @@ class Game
 		}
 	}
 
-	private function decideWinner(): Player 
-	{
-		return array_find($this->players, fn(Player $player) => !$player->getSnake()->isDead());
-	}
-
 	private function getPlayerOne(): Player
 	{
 		return $this->players[0];
 	}
 
+	/**
+	 * <summary>
+	 * Get second player, only available in multiplayer
+	 * </summary>
+	 */
 	private function getPlayerTwo(): ?Player
 	{
 		if (!$this->gameSettings->multiplayer || 1 === count($this->players)) return null;
