@@ -7,7 +7,7 @@ include_once "Util/Point.php";
 
 class Game
 {
-	private const float TICK = 75 * 1000;
+	private const float TICK = 125 * 1000;
 
 	public function __construct(private readonly array $players, private readonly Settings $gameSettings)
 	{
@@ -99,6 +99,23 @@ class Game
 			return;
 		}
 
+		foreach ($this->players as $player) {
+			$playerBinds = $this->gameSettings->getKeys($player);
+			switch ($key) {
+				case $playerBinds['UP']:
+					$player->getSnake()->setDirection(Direction::UP);
+					break;
+				case $playerBinds['RIGHT']:
+					$player->getSnake()->setDirection(Direction::RIGHT);
+					break;
+				case $playerBinds['DOWN']:
+					$player->getSnake()->setDirection(Direction::DOWN);
+					break;
+				case $playerBinds['LEFT']:
+					$player->getSnake()->setDirection(Direction::LEFT);
+					break;
+			}
+		}
 		// Figure out getting the keys from settings and listening to them
 	}
 

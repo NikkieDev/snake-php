@@ -41,9 +41,9 @@ class Snake
 	public function move(): void
 	{
 		$this->location = match ($this->direction) {
-			Direction::UP => new Point($this->location->x, $this->location->y+1),
+			Direction::UP => new Point($this->location->x, $this->location->y-1),
 			Direction::RIGHT => new Point($this->location->x+1, $this->location->y),
-			Direction::DOWN => new Point($this->location->x, $this->location->y-1),
+			Direction::DOWN => new Point($this->location->x, $this->location->y+1),
 			Direction::LEFT => new Point($this->location->x-1, $this->location->y)
 		};
 
