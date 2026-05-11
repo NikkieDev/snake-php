@@ -28,6 +28,22 @@ class Snake
 		$this->body[] = '#';
 	}
 
+	public function getBodyPartLocations(): array
+	{
+		$partLocations = [];
+
+		for ($i = count($this->body)-1; $i > 1; $i--) {
+			$partLocations[] = match($this->direction) {
+				Direction::UP => new Point($this->location->x, $this->location->y+$i),
+				Direction::RIGHT => new Point($this->location->x-$i, $this->location->y),
+				Direction::DOWN => new Point($this->location->x, $this->location->y-$i),
+				Direction::LEFT => new Point($this->location->x+$i, $this->location->y)
+			};
+		}
+
+		return $partLocations;
+	}
+
 	/**
 	 * <summary>
 	 * Move snake and it's body to $this->direction
@@ -55,9 +71,9 @@ class Snake
 		return $this->location;
 	}
 
-	public function setLocation(Point $loc): void
+	public function setLocation(Point $location): void
 	{
-		$this->location = $loc;
+		$this->location = $location;
 	}
 
 	public function getBody(): array
@@ -68,6 +84,11 @@ class Snake
 	public function setDirection(Direction $direction): void
 	{
 		$this->direction = $direction;
+	}
+
+	public function kill(): void
+	{
+		$this->dead = true;
 	}
 
 	public function isDead(): bool
