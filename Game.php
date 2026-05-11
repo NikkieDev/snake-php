@@ -200,7 +200,6 @@ class Game
 					break;
 			}
 		}
-		// Figure out getting the keys from settings and listening to them
 	}
 
 	private function decideWinner(): Player 

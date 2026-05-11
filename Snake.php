@@ -83,6 +83,9 @@ class Snake
 
 	public function setDirection(Direction $direction): void
 	{
+		if (($direction == Direction::DOWN || $direction == Direction::UP) && ($this->direction == Direction::DOWN || $this->direction == Direction::UP)) return;
+		if (($direction == Direction::RIGHT || $direction == Direction::LEFT) && ($this->direction == Direction::RIGHT || $this->direction == Direction::LEFT)) return;
+
 		$this->direction = $direction;
 	}
 
